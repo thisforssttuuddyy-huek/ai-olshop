@@ -1,78 +1,83 @@
 import streamlit as st
 import google.generativeai as genai
+from PIL import Image
 
 # --- PENGATURAN HALAMAN ---
 st.set_page_config(
-    page_title="AI Asisten Konten Bisnis",
-    page_icon="🚀",
+    page_title="AI Visual Content Director",
+    page_icon="🎬",
     layout="centered"
 )
 
-# --- PASSWORD APLIKASI ---
-APP_PASSWORD = "rahasia123ya" 
+APP_PASSWORD = "rahasia123" 
 
-st.title("🚀 AI Asisten Konten Bisnis & Olshop")
-st.write("Buat ide video TikTok, caption Instagram, dan hashtag otomatis untuk segala jenis bisnis dalam hitungan detik!")
+st.title("🎬 AI Visual Content Director")
+st.write("Upload foto menu/cafe Anda, dan AI akan membuatkan panduan syuting video shot-by-shot yang instan & estetik!")
 
-# --- SISTEM LOGIN SEDERHANA ---
 password_input = st.text_input("Masukkan Password Akses:", type="password")
 
 if password_input == APP_PASSWORD:
-    st.success("Akses diberikan! Selamat datang.")
+    st.success("Akses diberikan!")
     st.divider()
     
-    # --- FORM INPUT KONTEN ---
-    st.markdown("### 📝 Detail Bisnis & Produk")
+    st.markdown("### 📸 Unggah Foto Menu / Cafe Anda")
+    uploaded_file = st.file_uploader("Pilih foto (JPG/PNG):", type=["jpg", "jpeg", "png"])
     
-    # Fitur Baru: Pilih Kategori Bisnis biar fleksibel!
-    kategori_bisnis = st.selectbox(
-        "Pilih Kategori Bisnis:",
-        ["Online Shop (Baju, Skincare, Jualan Produk)", "Cafe / Resto / Kuliner", "Jasa / Lainnya"]
-    )
-    
-    nama_produk = st.text_input("Nama Produk / Menu / Event:", placeholder="Contoh: Nasi Goreng Iga Bakar / Sepatu Sneakers")
-    promo = st.text_area("Promo / Suasana / Detail Tambahan:", placeholder="Contoh: Diskon 15% khusus weekend, ada live music, tempatnya estetik.")
-    
-    # --- TOMBOL GENERATE ---
-    if st.button("✨ Buat Konten", type="primary", use_container_width=True):
-        if not nama_produk:
-            st.warning("⚠️ Mohon masukkan Nama Produk atau Menu.")
-        else:
-            with st.spinner('Sedang meracik konten ajaib dengan AI... ⏳'):
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Foto yang berhasil di-upload", use_container_width=True)
+        
+        detail_tambahan = st.text_input("Detail tambahan (Opsional):", placeholder="Contoh: Menu ini lagi diskon 15% khusus weekend")
+        
+        if st.button("🎬 Racik Panduan Video Visual", type="primary", use_container_width=True):
+            with st.spinner('AI sedang menganalisis foto dan menyusun panduan syuting... 🎥'):
                 try:
-                    # Mengambil API Key secara aman dari Secrets Streamlit
                     api_key = st.secrets["GEMINI_API_KEY"]
                     genai.configure(api_key=api_key)
                     
-                    # Menggunakan model terbaru tahun 2026 yang super cepat
+                    # Menggunakan gemini-2.5-flash yang jago membaca gambar
                     model = genai.GenerativeModel('gemini-2.5-flash')
                     
                     prompt = f"""
-                    Kamu adalah seorang social media manager ahli, digital marketer, dan copywriter handal.
-                    Tolong buatkan materi promosi yang sangat menarik, kreatif, kekinian (sesuai tren anak muda sekarang), dan persuasif berdasarkan informasi berikut:
-                    - Kategori Bisnis: {kategori_bisnis}
-                    - Nama Produk/Menu/Event: {nama_produk}
-                    - Detail/Promo/Suasana: {promo}
+                    Kamu adalah seorang Sutradara Konten TikTok/Reels profesional yang ahli dalam estetika kuliner dan cafe.
+                    Analisis foto yang diunggah oleh pengguna ini. Buatkan panduan video singkat (durasi 15 detik) yang sangat visual, mudah dipahami, tidak kaku, dan tidak terasa seperti buatan AI biasa.
                     
-                    Harap berikan hasil dengan format berikut (pastikan terstruktur, estetik, dan mudah dibaca):
+                    Detail tambahan dari pengguna: {detail_tambahan}
                     
-                    ## 🎬 1. Ide Konten Video TikTok / Reels (Visual & Kreatif)
-                    - **Kalimat Hook Pembuka (3 detik pertama yang memancing perhatian):** [Tulis kalimat hook yang kuat]
-                    - **Konsep Visual & Angle Kamera:** [Jelaskan adegan per adegan atau sudut kamera yang harus diambil agar estetik]
-                    - **Skrip Voice Over (VO):** [Tulis teks dialog/narasi yang santai, gaul, dan persuasif]
+                    Berikan output dengan format terstruktur berikut:
                     
-                    ## 📸 2. Caption Instagram / Sosial Media
-                    (Buat caption yang persuasif, gunakan spasi/paragraf yang enak dibaca, sertakan emoji yang relevan, info harga/promo, dan ajakan bertindak/Call to Action)
+                    ### 🎯 Rencana Konten: [Tulis Judul Konsep Video]
+                    **Saran Musik:** [Sebutkan jenis musik yang cocok, misal: lo-fi santai, tren jedag-jedug estetik, atau akustik]
                     
-                    ## #️⃣ 3. Hashtag Optimasi
-                    (Berikan 15-20 hashtag campuran yang relevan, sedang tren, dan spesifik sesuai kategori bisnis tersebut)
+                    ---
+                    
+                    ### 🎥 PANDUAN SYUTING (SHOT-BY-SHOT)
+                    
+                    *   **DETIK 00-03 (The Hook):**
+                        *   *Cara Ambil Video (Camera Angle):* [Jelaskan posisi kamera, misal: gerakkan HP dari bawah ke atas secara perlahan (tilt up) fokus ke produk]
+                        *   *Apa yang Terjadi di Video:* [Jelaskan aksi visualnya]
+                        *   *Teks di Layar (On-Screen Text):* [Tulis kalimat pendek yang bikin penasaran]
+                        
+                    *   **DETIK 03-10 (The Core):**
+                        *   *Cara Ambil Video (Camera Angle):* [Misal: ambil jarak dekat (close up) saat makanan diaduk/dipotong]
+                        *   *Apa yang Terjadi di Video:* [Jelaskan detail estetikanya]
+                        *   *Teks di Layar (On-Screen Text):* [Tulis informasi keunggulan produk/menu]
+                        
+                    *   **DETIK 10-15 (The Outro / CTA):**
+                        *   *Cara Ambil Video (Camera Angle):* [Misal: menjauh perlahan (pan out) memperlihatkan suasana meja cafe]
+                        *   *Teks di Layar (On-Screen Text):* [Ajakan bertindak, misal: 'Gass ke Ores.co akhir pekan ini!']
+                        
+                    ---
+                    
+                    ### ✍️ CAPTION & HASHTAG SANTAI
+                    [Buat 1 baris caption Instagram yang sangat santai gaya anak muda sekarang, diikuti 5-8 hashtag paling relevan]
                     """
                     
-                    response = model.generate_content(prompt)
+                    # Memanggil API dengan menyertakan gambar dan prompt teks
+                    response = model.generate_content([prompt, image])
                     
                     st.divider()
-                    st.markdown("### 🎉 Yeay! Konten Anda Sudah Siap:")
-                    st.info("Anda bisa langsung menyalin (copy) teks di bawah ini.")
+                    st.markdown("### 🎉 Panduan Syuting Video Anda Sudah Siap:")
                     st.markdown(response.text)
                     
                 except Exception as e:
