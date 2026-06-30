@@ -3,17 +3,16 @@ import google.generativeai as genai
 
 # --- PENGATURAN HALAMAN ---
 st.set_page_config(
-    page_title="AI Asisten Konten Olshop",
-    page_icon="🛍️",
+    page_title="AI Asisten Konten Bisnis",
+    page_icon="🚀",
     layout="centered"
 )
 
 # --- PASSWORD APLIKASI ---
-# Ganti password ini jika ingin mengubah akses pembeli
-APP_PASSWORD = "Rahasia123ya" 
+APP_PASSWORD = "rahasia123ya" 
 
-st.title("🛍️ AI Asisten Konten Olshop")
-st.write("Buat ide video TikTok, caption Instagram, dan hashtag otomatis dalam hitungan detik!")
+st.title("🚀 AI Asisten Konten Bisnis & Olshop")
+st.write("Buat ide video TikTok, caption Instagram, dan hashtag otomatis untuk segala jenis bisnis dalam hitungan detik!")
 
 # --- SISTEM LOGIN SEDERHANA ---
 password_input = st.text_input("Masukkan Password Akses:", type="password")
@@ -23,39 +22,50 @@ if password_input == APP_PASSWORD:
     st.divider()
     
     # --- FORM INPUT KONTEN ---
-    st.markdown("### 📝 Detail Produk")
-    nama_produk = st.text_input("Nama Produk:", placeholder="Contoh: Sepatu Sneakers Pria Anti Slip")
-    promo = st.text_area("Promo / Detail Tambahan:", placeholder="Contoh: Diskon 50% khusus hari ini, gratis ongkir seluruh Indonesia.")
+    st.markdown("### 📝 Detail Bisnis & Produk")
+    
+    # Fitur Baru: Pilih Kategori Bisnis biar fleksibel!
+    kategori_bisnis = st.selectbox(
+        "Pilih Kategori Bisnis:",
+        ["Online Shop (Baju, Skincare, Jualan Produk)", "Cafe / Resto / Kuliner", "Jasa / Lainnya"]
+    )
+    
+    nama_produk = st.text_input("Nama Produk / Menu / Event:", placeholder="Contoh: Nasi Goreng Iga Bakar / Sepatu Sneakers")
+    promo = st.text_area("Promo / Suasana / Detail Tambahan:", placeholder="Contoh: Diskon 15% khusus weekend, ada live music, tempatnya estetik.")
     
     # --- TOMBOL GENERATE ---
     if st.button("✨ Buat Konten", type="primary", use_container_width=True):
         if not nama_produk:
-            st.warning("⚠️ Mohon masukkan Nama Produk.")
+            st.warning("⚠️ Mohon masukkan Nama Produk atau Menu.")
         else:
-            with st.spinner('Sedang meracik konten ajaib untuk olshop Anda... ⏳'):
+            with st.spinner('Sedang meracik konten ajaib dengan AI... ⏳'):
                 try:
                     # Mengambil API Key secara aman dari Secrets Streamlit
                     api_key = st.secrets["GEMINI_API_KEY"]
                     genai.configure(api_key=api_key)
                     
+                    # Menggunakan model terbaru tahun 2026 yang super cepat
                     model = genai.GenerativeModel('gemini-2.5-flash')
                     
                     prompt = f"""
-                    Kamu adalah seorang social media manager ahli dan copywriter handal untuk online shop.
-                    Tolong buatkan materi promosi yang menarik, gaul, dan persuasif (bikin orang ingin beli) berdasarkan informasi berikut:
-                    - Nama Produk: {nama_produk}
-                    - Promo/Detail: {promo}
+                    Kamu adalah seorang social media manager ahli, digital marketer, dan copywriter handal.
+                    Tolong buatkan materi promosi yang sangat menarik, kreatif, kekinian (sesuai tren anak muda sekarang), dan persuasif berdasarkan informasi berikut:
+                    - Kategori Bisnis: {kategori_bisnis}
+                    - Nama Produk/Menu/Event: {nama_produk}
+                    - Detail/Promo/Suasana: {promo}
                     
-                    Harap berikan hasil dengan format berikut (pastikan terstruktur dan mudah dibaca):
+                    Harap berikan hasil dengan format berikut (pastikan terstruktur, estetik, dan mudah dibaca):
                     
-                    ## 🎬 1. Ide Konten Video TikTok
-                    (Jelaskan konsep videonya. Apa Hook/kalimat pertama yang menarik perhatian, bagaimana isi/visual videonya, dan apa Call to Action (CTA) di akhir video)
+                    ## 🎬 1. Ide Konten Video TikTok / Reels (Visual & Kreatif)
+                    - **Kalimat Hook Pembuka (3 detik pertama yang memancing perhatian):** [Tulis kalimat hook yang kuat]
+                    - **Konsep Visual & Angle Kamera:** [Jelaskan adegan per adegan atau sudut kamera yang harus diambil agar estetik]
+                    - **Skrip Voice Over (VO):** [Tulis teks dialog/narasi yang santai, gaul, dan persuasif]
                     
-                    ## 📸 2. Caption Instagram
-                    (Buat caption yang estetik, persuasif, gunakan spasi/paragraf yang enak dibaca, dan sertakan emoji yang relevan. Jangan lupa masukkan info promo dan ajakan membeli)
+                    ## 📸 2. Caption Instagram / Sosial Media
+                    (Buat caption yang persuasif, gunakan spasi/paragraf yang enak dibaca, sertakan emoji yang relevan, info harga/promo, dan ajakan bertindak/Call to Action)
                     
-                    ## #️⃣ 3. Hashtag
-                    (Berikan 15-20 hashtag campuran yang relevan, sedang tren, dan spesifik untuk produk tersebut)
+                    ## #️⃣ 3. Hashtag Optimasi
+                    (Berikan 15-20 hashtag campuran yang relevan, sedang tren, dan spesifik sesuai kategori bisnis tersebut)
                     """
                     
                     response = model.generate_content(prompt)
