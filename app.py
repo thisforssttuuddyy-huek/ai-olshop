@@ -99,7 +99,7 @@ st.markdown("""
 PASSWORD_SISTEM = "ores123"
 
 # --- BRANDING HEADER UTAMA ---
-st.markdown('<p class="main-title">⚡ TOOLS KREATOR & MARKETING SUITE Premium v5.6</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">⚡ TOOLS KREATOR & MARKETING SUITE Premium v5.7</p>', unsafe_allow_html=True)
 st.markdown('<p class="dev-subtitle">🚀 Developed with ❤️ by <b>Ky Dev</b> | 📸 Instagram: <a href="https://instagram.com/kyii_a.r" target="_blank">@kyii_a.r</a></p>', unsafe_allow_html=True)
 st.write("Sistem Multi-Agent AI Kreator Konten End-to-End & OmniChannel Reputation Manager.")
 
@@ -132,7 +132,7 @@ if password_input == PASSWORD_SISTEM:
 
     kode_input = st.sidebar.text_input("Masukkan Kode Lisensi Anda:", value=st.session_state.license_input_value, type="password")
 
-    # Daftar Logika Kode
+    # Daftar Logika Kode Rahasia Owner & Klien
     KODE_OWNER_SAKTI = "OWNER-UNLIMITED-99X"
     KODE_PREMIUM_30HARI = "PREM-ORES30D"
 
@@ -189,7 +189,7 @@ if password_input == PASSWORD_SISTEM:
     ])
 
     # ==========================================
-    # TAB 1: REPUTATION MANAGER
+    # TAB 1: REPUTATION MANAGER (FIXED MODEL 2026)
     # ==========================================
     with tab1:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
@@ -214,7 +214,7 @@ if password_input == PASSWORD_SISTEM:
                     """
                     try:
                         response = client.models.generate_content(
-                            model='gemini-1.5-flash',
+                            model='gemini-2.5-flash',
                             contents=ulasan_text,
                             config=types.GenerateContentConfig(
                                 system_instruction=system_instruction,
@@ -223,7 +223,7 @@ if password_input == PASSWORD_SISTEM:
                             )
                         )
                         res_json = json.loads(response.text)
-                        st.write(f"**Analimen Sentimen:** {res_json.get('sentiment')}")
+                        st.write(f"**Analisis Sentimen:** {res_json.get('sentiment')}")
                         st.info(res_json.get("reply_draft"))
                         
                         if "basi" in ulasan_text.lower() or "kecoak" in ulasan_text.lower():
@@ -234,34 +234,41 @@ if password_input == PASSWORD_SISTEM:
                             else:
                                 st.markdown("🔒 **Fitur Premium Terkunci:** Draf kompensasi ganti rugi privat WhatsApp Manager (Hubungi owner untuk aktivasi lisensi).")
                     except Exception as e:
-                        st.error(f"Eror: {e}")
+                        st.error(f"Eror Modul 1: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # TAB 2: BRANDING ASSESSMENT
+    # TAB 2: BRANDING ASSESSMENT (FIXED CONFIG TO LEAK)
     # ==========================================
     with tab2:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
         st.markdown("### 🧬 Modul 2: Personal Branding Assessment & Blueprint")
         st.write("Isi data fondasi brand lu agar AI mengerti posisi pasar dan USP bisnis lu sebelum membuat konten.")
         
-        st.text_input("Langkah 1: Siapa Target Audiens Utama Anda?", value="Anak Muda & Komunitas Pencinta Live Music")
-        st.text_input("Langkah 2: Apa Keunikan Utama (USP) Bisnis Anda dibanding Pesaing?", value="Cafe Outdoor Terluas dengan Live Music Terbaik Setiap Malam")
-        st.text_input("Langkah 3: Model Bisnis Apa yang Anda Jalankan?", value="FnB Tempat Nongkrong & Event Komunitas")
+        step1 = st.text_input("Langkah 1: Siapa Target Audiens Utama Anda?", value="Anak Muda & Komunitas Pencinta Live Music")
+        step2 = st.text_input("Langkah 2: Apa Keunikan Utama (USP) Bisnis Anda dibanding Pesaing?", value="Cafe Outdoor Terluas dengan Live Music Terbaik Setiap Malam")
+        step3 = st.text_input("Langkah 3: Model Bisnis Apa yang Anda Jalankan?", value="FnB Tempat Nongkrong & Event Komunitas")
         
         if st.button("🧬 Generate Master Blueprint", key="btn_agent2"):
             with st.spinner("AI menyintesis data personal brand lu..."):
-                blueprint_prompt = "Buatkan kerangka master strategi personal branding konten bisnis kuliner dengan target anak muda berdasarkan USP tempat live music outdoor."
-                response = client.models.generate_content(model='gemini-1.5-flash', contents=blueprint_prompt)
-                st.subheader("📋 Hasil Cetak Master Blueprint:")
-                st.markdown(response.text)
-                
-                if not is_premium:
-                    st.markdown("<p style='color:#FF8C00;'>🔒 <b>Fitur Premium Terkunci:</b> Deep Competitive Positioning (Analisis 3 Kompetitor Terdekat di Google Search Live) hanya terbuka bagi versi premium.</p>", unsafe_allow_html=True)
+                try:
+                    blueprint_prompt = f"Buatkan kerangka master strategi personal branding konten bisnis kuliner dengan target audiens: {step1}, menggunakan USP: {step2}, dengan model bisnis: {step3}."
+                    response = client.models.generate_content(
+                        model='gemini-2.5-flash', 
+                        contents=blueprint_prompt,
+                        config=types.GenerateContentConfig(temperature=0.5)
+                    )
+                    st.subheader("📋 Hasil Cetak Master Blueprint:")
+                    st.markdown(response.text)
+                    
+                    if not is_premium:
+                        st.markdown("<p style='color:#FF8C00;'>🔒 <b>Fitur Premium Terkunci:</b> Deep Competitive Positioning (Analisis 3 Kompetitor Terdekat di Google Search Live) hanya terbuka bagi versi premium.</p>", unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Eror Modul 2: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # TAB 3: SCRIPT BUILDER & IDEATION
+    # TAB 3: SCRIPT BUILDER & IDEATION (FIXED CONFIG)
     # ==========================================
     with tab3:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
@@ -278,21 +285,35 @@ if password_input == PASSWORD_SISTEM:
             
         if btn_hook:
             with st.spinner("Meracik pilihan kalimat hook..."):
-                prompt = f"Buatkan 3 pilihan kalimat hook marketing video tiktok kontroversial tentang topik: {topik_konten}"
-                response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
-                st.write("**Pilihan Opsi Hook Anda:**")
-                st.info(response.text)
+                try:
+                    prompt = f"Buatkan 3 pilihan kalimat hook marketing video tiktok kontroversial tentang topik: {topik_konten}"
+                    response = client.models.generate_content(
+                        model='gemini-2.5-flash', 
+                        contents=prompt,
+                        config=types.GenerateContentConfig(temperature=0.7)
+                    )
+                    st.write("**Pilihan Opsi Hook Anda:**")
+                    st.info(response.text)
+                except Exception as e:
+                    st.error(f"Eror Hook: {e}")
                 
         if btn_full:
             with st.spinner("Menyusun skrip lengkap..."):
-                prompt = f"Buatkan skrip video pendek tiktok utuh (Struktur: Hook menarik, Isi edukasi, CTA jualan) dengan topik: {topik_konten}"
-                response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
-                st.subheader("Draft Script Terkini:")
-                st.markdown(response.text)
+                try:
+                    prompt = f"Buatkan skrip video pendek tiktok utuh (Struktur: Hook menarik, Isi edukasi, CTA jualan) dengan topik: {topik_konten}"
+                    response = client.models.generate_content(
+                        model='gemini-2.5-flash', 
+                        contents=prompt,
+                        config=types.GenerateContentConfig(temperature=0.6)
+                    )
+                    st.subheader("Draft Script Terkini:")
+                    st.markdown(response.text)
+                except Exception as e:
+                    st.error(f"Eror Script: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # TAB 4: REMIX VIDEO VIRAL
+    # TAB 4: REMIX VIDEO VIRAL (FIXED CONFIG)
     # ==========================================
     with tab4:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
@@ -306,10 +327,17 @@ if password_input == PASSWORD_SISTEM:
                 st.warning("Masukkan teks transkripnya dulu, bro!")
             else:
                 with st.spinner("AI sedang membedah psikologi video tersebut..."):
-                    prompt = f"Ambil struktur emosi dan gaya penyampaian dari transkrip berikut, lalu ubah topiknya menjadi promosi menu kopi susu di {nama_bisnis}. Ini teksnya: {transkrip_input}"
-                    response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
-                    st.subheader("🎉 Hasil Remix Konten Baru:")
-                    st.markdown(response.text)
+                    try:
+                        prompt = f"Ambil struktur emosi dan gaya penyampaian dari transkrip berikut, lalu ubah topiknya menjadi promosi menu kopi susu di {nama_bisnis}. Ini teksnya: {transkrip_input}"
+                        response = client.models.generate_content(
+                            model='gemini-2.5-flash', 
+                            contents=prompt,
+                            config=types.GenerateContentConfig(temperature=0.5)
+                        )
+                        st.subheader("🎉 Hasil Remix Konten Baru:")
+                        st.markdown(response.text)
+                    except Exception as e:
+                        st.error(f"Eror Modul 4: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
