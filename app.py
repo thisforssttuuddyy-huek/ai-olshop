@@ -1,349 +1,348 @@
 import streamlit as st
 import json
-import random
+import datetime
 from google import genai
 from google.genai import types
 
-# --- CONFIGURASI HALAMAN STREAMLIT ---
+# ==========================================
+# 🎨 CUSTOM CSS FOR PREMIUM COLOR THEMING
+# ==========================================
 st.set_page_config(
-    page_title="OmniChannel AI Marketing Suite",
+    page_title="Tools Kreator Premium Suite by Ky Dev",
     page_icon="⚡",
     layout="wide"
 )
 
-# --- SISTEM KEAMANAN & PASSWORD ---
+st.markdown("""
+    <style>
+    /* Mengubah warna background utama */
+    .stApp {
+        background-color: #0E1117;
+    }
+    
+    /* Mengubah warna teks utama */
+    h1, h2, h3, h4, p, span, label {
+        color: #FFFFFF !important;
+    }
+    
+    /* Custom Card/Kotak Modul biar berwarna dan berkilau */
+    .premium-card {
+        background-color: #161B22;
+        border: 1px solid #FFC107;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 15px rgba(255, 193, 7, 0.15);
+        margin-bottom: 20px;
+    }
+    
+    /* Kotak Free Trial */
+    .trial-card {
+        background-color: #1F1915;
+        border: 1px solid #FF8C00;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+    
+    /* Judul Utama Bergradasi */
+    .main-title {
+        background: linear-gradient(45deg, #FFC107, #FF8C00);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 40px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    /* Subtitle Developer Branding */
+    .dev-subtitle {
+        color: #A3B3C6 !important;
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 25px;
+    }
+    .dev-subtitle a {
+        color: #FFC107 !important;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .dev-subtitle a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Mengubah gaya tombol standar */
+    div.stButton > button:first-child {
+        background-color: #FFC107 !important;
+        color: #0E1117 !important;
+        font-weight: bold !important;
+        border-radius: 8px !important;
+        border: none !important;
+        box-shadow: 0px 4px 10px rgba(255, 193, 7, 0.3);
+        transition: all 0.3s ease;
+    }
+    div.stButton > button:first-child:hover {
+        background-color: #FF8C00 !important;
+        box-shadow: 0px 6px 15px rgba(255, 140, 0, 0.5);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- KONFIGURASI PASSWORD SISTEM ---
 PASSWORD_SISTEM = "ores123"
 
-st.title("⚡ OmniChannel AI Marketing Suite v5.0")
-st.write("Sistem Multi-Agent AI Terintegrasi untuk Digital Marketing, Reputasi Multi-Platform, dan Desain Kreatif.")
+# --- BRANDING HEADER UTAMA ---
+st.markdown('<p class="main-title">⚡ TOOLS KREATOR & MARKETING SUITE Premium v5.6</p>', unsafe_allow_html=True)
+st.markdown('<p class="dev-subtitle">🚀 Developed with ❤️ by <b>Ky Dev</b> | 📸 Instagram: <a href="https://instagram.com/kyii_a.r" target="_blank">@kyii_a.r</a></p>', unsafe_allow_html=True)
+st.write("Sistem Multi-Agent AI Kreator Konten End-to-End & OmniChannel Reputation Manager.")
 
 password_input = st.text_input("🔑 Masukkan Password Akses Sistem:", type="password")
 
 if password_input == PASSWORD_SISTEM:
-    st.success("Akses Sistem Multi-Agent Aktif!")
+    st.success("Akses Dashboard Terverifikasi!")
     st.divider()
 
     # --- INISIALISASI CLIENT GEMINI API ---
     try:
-        # Mengambil API KEY dari Streamlit Secrets
         api_key = st.secrets["GEMINI_API_KEY"]
         client = genai.Client(api_key=api_key)
     except Exception as e:
-        st.error(f"Gagal memuat API Key dari Streamlit Secrets. Pastikan 'GEMINI_API_KEY' sudah dikonfigurasi. Eror: {e}")
+        st.error(f"Gagal memuat API Key dari Streamlit Secrets. Eror: {e}")
         st.stop()
 
-    # --- KONFIGURASI PROFIL BISNIS (SIDEBAR) ---
-    st.sidebar.header("⚙️ Profil Bisnis & CS")
-    nama_bisnis = st.sidebar.text_input("Nama Bisnis/Cafe:", value="Ores.co")
-    wa_cs = st.sidebar.text_input("Nomor WA CS (Format 62):", value="628123456789")
-    ig_bisnis = st.sidebar.text_input("Username Instagram Bisnis:", value="ores.co")
-    tiktok_bisnis = st.sidebar.text_input("Username TikTok Bisnis:", value="ores.co")
+    # ==========================================
+    # 🔑 LOGIKA KODE LISENSI & COUNTDOWN
+    # ==========================================
+    if "account_status" not in st.session_state:
+        st.session_state.account_status = "FREE_TRIAL"
+        st.session_state.expiry_time = None
+
+    st.sidebar.markdown('<div class="premium-card" style="border-color:#FF8C00;">', unsafe_allow_html=True)
+    st.sidebar.subheader("🔑 PENGATURAN LISENSI")
     
-    st.sidebar.divider()
-    st.sidebar.subheader("📊 Status Kuota Pengguna (Trial 1 Minggu)")
-    st.sidebar.info("💡 Akun Anda berada dalam masa peninjauan trial. Beberapa fitur taktis harian terbuka dengan batasan kuota.")
+    # Gunakan session_state untuk mengontrol nilai input kode saat tombol hapus premium ditekan
+    if "license_input_value" not in st.session_state:
+        st.session_state.license_input_value = ""
 
-    # --- NAVIGASI ANTARA 7 AGENT ---
-    pilihan_agent = st.selectbox(
-        "🤖 Pilih Agen AI yang Ingin Anda Pekerjakan Hari Ini:",
-        [
-            "Agent 1: OmniChannel Reputation Manager (Balas Ulasan 4 Platform)",
-            "Agent 2: Executive Analytics & Operational Auditor (Analisis Data Masalah)",
-            "Agent 3: Creative Campaign & Event Director (Strategi Promo & Live Music)",
-            "Agent 4: High-Converting Copywriter (Skrip Video & Caption AIDA)",
-            "Agent 5: Automated Graphic Designer (Panduan Visual & Cetak Poster)",
-            "Agent 6: Automation & Workflow Copilot (Arsitektur Admin Otomatis)",
-            "Agent 7: Market Intelligence & Competitor Spy (Mata-Mata Tren Live Internet)"
-        ]
-    )
-    st.divider()
+    kode_input = st.sidebar.text_input("Masukkan Kode Lisensi Anda:", value=st.session_state.license_input_value, type="password")
+
+    # Daftar Logika Kode
+    KODE_OWNER_SAKTI = "OWNER-UNLIMITED-99X"
+    KODE_PREMIUM_30HARI = "PREM-ORES30D"
+
+    if kode_input == KODE_OWNER_SAKTI:
+        st.session_state.account_status = "OWNER_SAKTI"
+    elif kode_input == KODE_PREMIUM_30HARI:
+        st.session_state.account_status = "PREMIUM_CLIENT"
+        st.session_state.expiry_time = "29 Hari, 23 Jam, 59 Menit"
+    else:
+        st.session_state.account_status = "FREE_TRIAL"
+
+    # Tampilan Visual Status Berwarna di Sidebar
+    if st.session_state.account_status == "OWNER_SAKTI":
+        st.sidebar.markdown("<h3 style='color: #00FF00 !important;'>👑 STATUS: OWNER SAKTI</h3>", unsafe_allow_html=True)
+        st.sidebar.info("Akses Tanpa Batas Kuota, Tanpa Batas Waktu (Selamanya Aktif).")
+        is_premium = True
+    elif st.session_state.account_status == "PREMIUM_CLIENT":
+        st.sidebar.markdown("<h3 style='color: #FFC107 !important;'>💎 STATUS: PREMIUM ACTIVE</h3>", unsafe_allow_html=True)
+        st.sidebar.error(f"⏳ HITUNG MUNDUR SISA WAKTU:\n**{st.session_state.expiry_time}**")
+        is_premium = True
+    else:
+        st.sidebar.markdown("<h3 style='color: #FF8C00 !important;'>🟢 STATUS: FREE TRIAL</h3>", unsafe_allow_html=True)
+        st.sidebar.warning("Batasan kuota harian aktif. Masukkan kode untuk membuka fitur premium.")
+        is_premium = False
+
+    # --- 🛠️ TOMBOL HAPUS PREMIUM / RESET TO FREE (SISTEM TESTING LU) ---
+    if is_premium:
+        if st.sidebar.button("❌ Remove Premium / Reset to Free", type="secondary"):
+            st.session_state.account_status = "FREE_TRIAL"
+            st.session_state.expiry_time = None
+            st.session_state.license_input_value = ""
+            st.rerun()
+
+    st.sidebar.markdown('</div>', unsafe_allow_html=True)
+
+    # --- SETUP DATA BISNIS (SIDEBAR) ---
+    st.sidebar.header("⚙️ PROFIL DATA BISNIS")
+    nama_bisnis = st.sidebar.text_input("Nama Brand / Cafe:", value="Ores.co")
+    alamat_bisnis = st.sidebar.text_area("Alamat Fisik Toko:", value="Jl. Kasuari Raya No.1, Cikarang Baru, Bekasi, Jawa Barat")
+    link_maps = st.sidebar.text_input("Link Google Maps:", value="https://maps.google.com/?q=Ores+Co+Cikarang")
+    wa_cs = st.sidebar.text_input("WhatsApp Admin (62):", value="628123456789")
+
+    # --- SIDEBAR FOOTER BRANDING ---
+    st.sidebar.markdown("<br><br><hr><center style='color: #A3B3C6;'>🛠️ App Created by <b>Ky Dev</b><br>🔗 IG: <a href='https://instagram.com/kyii_a.r' target='_blank' style='color:#FFC107; text-decoration:none;'>@kyii_a.r</a></center>", unsafe_allow_html=True)
+
+    # --- INTEGRASI MENU 5 TAB MULTI-MODUL ---
+    st.subheader("🤖 Silakan Pilih Modul Kerja AI Agent Anda:")
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🛡️ 1. Reputation Manager", 
+        "🧬 2. Branding Assessment", 
+        "🎬 3. Script & Ideation", 
+        "🔄 4. Remix Video Viral", 
+        "📅 5. Funnel & Calendar"
+    ])
 
     # ==========================================
-    # AGENT 1: OMNICHANNEL REPUTATION MANAGER
+    # TAB 1: REPUTATION MANAGER
     # ==========================================
-    if "Agent 1" in pilihan_agent:
-        st.markdown("### 🛡️ Agent 1: OmniChannel Reputation & PR Crisis Manager")
-        st.write("**Fungsi:** Membalas ulasan masuk secara otomatis di 4 platform dengan karakter bahasa unik (Google Maps = Sopan/Solutif, IG = Estetik/Hangat, TikTok = Gaul/Santai, WA = Personal/Responsif).")
+    with tab1:
+        st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+        st.markdown("### 🛡️ Modul 1: OmniChannel Reputation & Crisis Management")
+        st.write("Membalas ulasan masuk di 4 platform otomatis sesuai gaya platform masing-masing.")
+        st.caption("🟢 **Kuota Gratis:** 5 kali per hari." if not is_premium else "👑 **Kuota:** UNLIMITED")
         
-        # Indikator Kuota Trial
-        st.caption("🟢 **Kuota Free Trial:** 5 penggunaan per hari.")
+        platform = st.selectbox("Pilih Platform Media Sosial:", ["Google Maps", "Instagram", "TikTok", "WhatsApp"])
+        ulasan_text = st.text_area("Salin Kalimat Ulasan Konsumen di Sini:", placeholder="Contoh: Lokasi cafenya di sebelah mana ya kak? Buka jam berapa?")
         
-        platform = st.selectbox("Pilih Platform Ulasan/Komentar:", ["Google Maps", "Instagram", "TikTok", "WhatsApp"])
-        ulasan_input = st.text_area("Salin Teks Ulasan / Komentar Konsumen di Sini:", placeholder="Contoh: Makanannya lumayan, tapi pelayanannya lambat banget tolong diperbaiki.")
-        
-        rating = 5
-        if platform == "Google Maps":
-            rating = st.slider("Rating Bintang Pelanggan:", min_value=1, max_value=5, value=5)
-
-        if st.button("🚀 Jalankan Agen 1", type="primary"):
-            if not ulasan_input:
-                st.warning("Harap masukkan teks ulasan terlebih dahulu!")
+        if st.button("🚀 Jalankan Analisis Reputasi", key="btn_agent1"):
+            if not ulasan_text:
+                st.warning("Mohon isi teks ulasannya dulu!")
             else:
-                with st.spinner("Agen sedang membaca platform dan meracik draf kalimat..."):
+                with st.spinner("AI sedang membaca ulasan..."):
+                    system_instruction = f"""
+                    Anda adalah Manajer Reputasi Senior untuk {nama_bisnis} yang beralamat di {alamat_bisnis} (Maps: {link_maps}).
+                    Balas ulasan dengan memanggil konsumen menggunakan kata 'Kakak'.
+                    Sesuaikan gaya bahasa: Google Maps (sopan), Instagram (estetik hangat), TikTok (gaul santai), WhatsApp (responsif cepat).
+                    Jika bertanya lokasi, wajib lampirkan link maps {link_maps}.
+                    Output wajib JSON: {{"sentiment": "POSITIF/NEGATIF", "reply_draft": "isi balasan"}}
+                    """
                     try:
-                        system_instruction = f"""
-                        Anda adalah Agen AI Senior spesialis Manajemen Reputasi untuk bisnis bernama '{nama_bisnis}'.
-                        Tugas Anda adalah meracik balasan ulasan/komentar pelanggan sesuai dengan karakteristik platform {platform}.
-                        Panggilan untuk konsumen di semua platform wajib menggunakan kata 'Kakak'.
-                        
-                        Aturan Karakter Bahasa Platform:
-                        - Google Maps: Bahasa sopan, formal-profesional, fokus pada terima kasih atau penyelesaian masalah.
-                        - Instagram: Bahasa estetik, ramah, hangat, interaktif, dan gunakan beberapa emoji yang relevan.
-                        - TikTok: Bahasa sangat kasual, gaul ala anak muda, singkat, santai, dan ekspresif.
-                        - WhatsApp: Bahasa personal, responsif, berorientasi pada pelayanan langsung (Customer Service).
-                        
-                        Logika Kasus:
-                        - Jika review POSITIF: Ucapkan terima kasih, sebutkan menu yang dipuji (jika ada), undang kembali secara halus.
-                        - Jika review NEGATIF (atau Rating 1-3): Jangan defensif. Minta maaf dengan tulus atas nama manajemen. Arahkan untuk penyelesaian masalah via WA {wa_cs} atau IG @{ig_bisnis}.
-                        
-                        Output WAJIB berupa JSON dengan key:
-                        {{
-                          "sentiment": "POSITIF" atau "NEGATIF",
-                          "reply_draft": "Isi teks balasan Anda di sini"
-                        }}
-                        """
-                        
-                        prompt = f"Platform: {platform}\nRating: {rating}/5\nTeks Masukan: '{ulasan_input}'"
-                        
                         response = client.models.generate_content(
                             model='gemini-1.5-flash',
-                            contents=prompt,
+                            contents=ulasan_text,
                             config=types.GenerateContentConfig(
                                 system_instruction=system_instruction,
                                 response_mime_type="application/json",
-                                temperature=0.4
-                            ),
+                                temperature=0.3
+                            )
                         )
+                        res_json = json.loads(response.text)
+                        st.write(f"**Analimen Sentimen:** {res_json.get('sentiment')}")
+                        st.info(res_json.get("reply_draft"))
                         
-                        hasil_json = json.loads(response.text)
-                        
-                        st.subheader("🎉 Hasil Kerja Agen 1:")
-                        if hasil_json.get("sentiment") == "POSITIF":
-                            st.success(f"🟢 **Sentimen Terdeteksi:** {hasil_json.get('sentiment')}")
-                        else:
-                            st.error(f"🔴 **Sentimen Terdeteksi:** {hasil_json.get('sentiment')}")
-                        
-                        st.markdown("**Draf Kalimat Balasan:**")
-                        st.info(hasil_json.get("reply_draft"))
-                        
-                        # FITUR PREMIUM TRIGGERS (ANTI-VIRAL REDIRECTION)
-                        kata_fatal = ["basi", "kecoak", "kasar", "rambut", "ulat", "racun", "kecewa berat", "menyesal"]
-                        if any(kata in ulasan_input.lower() for kata in kata_fatal) or rating <= 2:
-                            st.divider()
-                            st.markdown("### 💎 Paket Proteksi Premium Terdeteksi (Terkunci)")
-                            st.warning("⚠️ **SISTEM ANTI-VIRAL DETECTED:** Ulasan ini mengandung isu operasional sensitif yang berpotensi memicu blunder publik.")
-                            st.markdown(f"""
-                            **Fitur Premium Terkunci:**
-                            - **Draf Chat WhatsApp Jalur Privat:** Teks penawaran ganti rugi/kompensasi intern khusus dari Manager agar konsumen melunakkan amarahnya dan bersedia menghapus ulasan buruk secara damai.
-                            - **Direct Link WA Routing:** Tombol otomatis untuk langsung membuka aplikasi WhatsApp dan mengirim draf kompensasi ke konsumen.
-                            """)
-                            st.button("🔓 Buka Fitur Premium (Langganan)", key="lock_a1_premium")
-                            
+                        if "basi" in ulasan_text.lower() or "kecoak" in ulasan_text.lower():
+                            st.markdown("<hr>", unsafe_allow_html=True)
+                            st.error("⚠️ [SISTEM CRITICAL DETECTED] Ulasan mengandung unsur bahaya viral.")
+                            if is_premium:
+                                st.success("🔓 Fitur Premium Terbuka: Berikut draf chat kompensasi privat WhatsApp untuk dikirim oleh Manager: 'Halo Kak, kami dari manajemen memohon maaf sebesar-besarnya...'")
+                            else:
+                                st.markdown("🔒 **Fitur Premium Terkunci:** Draf kompensasi ganti rugi privat WhatsApp Manager (Hubungi owner untuk aktivasi lisensi).")
                     except Exception as e:
-                        st.error(f"Terjadi kesalahan teknis: {e}")
+                        st.error(f"Eror: {e}")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # AGENT 2: EXECUTIVE ANALYTICS
+    # TAB 2: BRANDING ASSESSMENT
     # ==========================================
-    elif "Agent 2" in pilihan_agent:
-        st.markdown("### 📊 Agent 2: Executive Analytics & Operational Auditor")
-        st.write("**Fungsi:** Membedah kumpulan keluhan atau ulasan berkala untuk mengekstrak masalah operasional terbesar di dapur atau pelayanan sebagai bahan evaluasi manajemen.")
-        st.caption("🟢 **Kuota Free Trial:** 2 kali analisis data teks per minggu.")
+    with tab2:
+        st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+        st.markdown("### 🧬 Modul 2: Personal Branding Assessment & Blueprint")
+        st.write("Isi data fondasi brand lu agar AI mengerti posisi pasar dan USP bisnis lu sebelum membuat konten.")
         
-        data_ulasan_manual = st.text_area("Masukkan Kumpulan Ulasan/Komplain Konsumen Seminggu Terakhir (Pisahkan dengan baris baru):", placeholder="Ulasan 1: Pelayanannya lama banget kasirnya cemberut\nUlasan 2: AC lantai 2 bocor dan panas...")
+        st.text_input("Langkah 1: Siapa Target Audiens Utama Anda?", value="Anak Muda & Komunitas Pencinta Live Music")
+        st.text_input("Langkah 2: Apa Keunikan Utama (USP) Bisnis Anda dibanding Pesaing?", value="Cafe Outdoor Terluas dengan Live Music Terbaik Setiap Malam")
+        st.text_input("Langkah 3: Model Bisnis Apa yang Anda Jalankan?", value="FnB Tempat Nongkrong & Event Komunitas")
         
-        if st.button("🚀 Jalankan Agen 2", type="primary"):
-            if not data_ulasan_manual:
-                st.warning("Harap isi kumpulan teks ulasan terlebih dahulu!")
-            else:
-                with st.spinner("Agen sedang mengaudit masalah operasional..."):
-                    try:
-                        system_instruction = f"Anda adalah Auditor Bisnis internal untuk '{nama_bisnis}'. Bedah data keluhan yang diberikan, petakan masalah utamanya, dan berikan poin ringkas rekomendasi perbaikan untuk manajemen dapur/staf lapangan."
-                        
-                        response = client.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=data_ulasan_manual,
-                            config=types.GenerateContentConfig(system_instruction=system_instruction, temperature=0.2)
-                        )
-                        st.subheader("📋 Laporan Audit Masalah Operasional:")
-                        st.markdown(response.text)
-                        
-                        # Kunci Premium Bulk Upload
-                        st.divider()
-                        st.error("🔒 FITUR BULK UPLOAD EXCEL / GRAPHIC REPORT TERKUNCI")
-                        st.write("Di paket premium, Anda cukup mengunggah file .XLSX / .CSV hasil ekspor data ulasan Google Maps selama sebulan. AI akan langsung memproses ribuan data secara instan dan menampilkan grafik diagram batang otomatis untuk bahan rapat direksi.")
-                        st.file_uploader("Upload Data Excel Bulanan (.xlsx / .csv):", disabled=True)
-                        st.button("🔓 Upgrade untuk Buka Bulk Upload & Grafik PDF", key="lock_a2")
-                    except Exception as e:
-                        st.error(f"Terjadi kesalahan: {e}")
+        if st.button("🧬 Generate Master Blueprint", key="btn_agent2"):
+            with st.spinner("AI menyintesis data personal brand lu..."):
+                blueprint_prompt = "Buatkan kerangka master strategi personal branding konten bisnis kuliner dengan target anak muda berdasarkan USP tempat live music outdoor."
+                response = client.models.generate_content(model='gemini-1.5-flash', contents=blueprint_prompt)
+                st.subheader("📋 Hasil Cetak Master Blueprint:")
+                st.markdown(response.text)
+                
+                if not is_premium:
+                    st.markdown("<p style='color:#FF8C00;'>🔒 <b>Fitur Premium Terkunci:</b> Deep Competitive Positioning (Analisis 3 Kompetitor Terdekat di Google Search Live) hanya terbuka bagi versi premium.</p>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # AGENT 3: CREATIVE CAMPAIGN & EVENT DIRECTOR
+    # TAB 3: SCRIPT BUILDER & IDEATION
     # ==========================================
-    elif "Agent 3" in pilihan_agent:
-        st.markdown("### 🎸 Agent 3: The Creative Campaign & Event Director")
-        st.write("**Fungsi:** Merancang konsep event kreatif, taktik promosi, dan *gimmick* khusus untuk meramaikan cafe pada hari kerja (*weekdays*) seperti event *live music* harian.")
-        st.caption("🟢 **Kuota Free Trial:** 3 kali pembuatan konsep per minggu.")
+    with tab3:
+        st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+        st.markdown("### 🎬 Modul 3: Script Builder & Ideation Room")
+        st.write("Ubah ide mentah menjadi skrip video TikTok/Reels berstruktur ketat (Hook, Isi, CTA).")
         
-        target_event = st.text_input("Apa Target Promosi / Event Anda?", placeholder="Contoh: Ngeramein hari Selasa malam pas jadwal Live Music akustik")
+        topik_konten = st.text_input("Masukkan Topik Konten Singkat:", value="Alasan anak muda harus ke Ores.co hari Selasa malam")
         
-        if st.button("🚀 Jalankan Agen 3", type="primary"):
-            if not target_event:
-                st.warning("Masukkan target event promosi terlebih dahulu!")
-            else:
-                with st.spinner("Agen sedang menyusun konsep gimmick kreatif..."):
-                    try:
-                        system_instruction = f"Anda adalah Creative Director untuk '{nama_bisnis}'. Buatkan 1 ide konsep acara komplit beserta gimmick marketing interaktif anak muda agar target event tersebut ramai pengunjung."
-                        response = client.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=target_event,
-                            config=types.GenerateContentConfig(system_instruction=system_instruction, temperature=0.6)
-                        )
-                        st.subheader("💡 Rekomendasi Konsep & Gimmick Event:")
-                        st.markdown(response.text)
-                        
-                        st.divider()
-                        st.error("🔒 FITUR LISENSI PREMIUM: FULL 30-DAYS CONTENT CALENDAR TERKUNCI")
-                        st.write("Paket premium membuka akses pembuatan kalender konten media sosial utuh selama 30 hari penuh, lengkap dengan matriks target audiens (*Customer Persona*) dan strategi promo psikologis anti-boncos.")
-                        st.button("🔓 Aktifkan Kalender Konten 30 Hari", key="lock_a3")
-                    except Exception as e:
-                        st.error(f"Terjadi kesalahan: {e}")
+        col_b1, col_b2 = st.columns(2)
+        with col_b1:
+            btn_hook = st.button("⚡ Generate Opsi Hook", key="btn_hook")
+        with col_b2:
+            btn_full = st.button("🎬 Generate Full Script", key="btn_full")
+            
+        if btn_hook:
+            with st.spinner("Meracik pilihan kalimat hook..."):
+                prompt = f"Buatkan 3 pilihan kalimat hook marketing video tiktok kontroversial tentang topik: {topik_konten}"
+                response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
+                st.write("**Pilihan Opsi Hook Anda:**")
+                st.info(response.text)
+                
+        if btn_full:
+            with st.spinner("Menyusun skrip lengkap..."):
+                prompt = f"Buatkan skrip video pendek tiktok utuh (Struktur: Hook menarik, Isi edukasi, CTA jualan) dengan topik: {topik_konten}"
+                response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
+                st.subheader("Draft Script Terkini:")
+                st.markdown(response.text)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # AGENT 4: HIGH-CONVERTING COPYWRITER
+    # TAB 4: REMIX VIDEO VIRAL
     # ==========================================
-    elif "Agent 4" in pilihan_agent:
-        st.markdown("### ✍️ Agent 4: The High-Converting Copywriter")
-        st.write("**Fungsi:** Membuat teks tulisan iklan, skrip video Reels/TikTok, atau caption media sosial terstruktur menggunakan formula psikologi pemasaran.")
-        st.caption("🟢 **Kuota Free Trial:** 5 kali pembuatan teks per hari.")
+    with tab4:
+        st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+        st.markdown("### 🔄 Modul 4: Video to Script (Extract & Remix Konten Viral)")
+        st.write("Tempel transkrip teks dari video orang lain yang viral, lalu suruh AI merombaknya otomatis agar sesuai dengan brand cafe/bisnis lu.")
         
-        jenis_copy = st.selectbox("Pilih Jenis Teks Copywriting:", ["Skrip Video TikTok/Reels (Storytelling)", "Caption Instagram Estetik", "Template Jawaban Otomatis (FAQ CS)"])
-        bahan_promo = st.text_input("Menu / Promo Apa yang Ingin Diangkat?", placeholder="Contoh: Menu baru Matcha Espresso Latte, promo Buy 1 Get 1 khusus hari Jumat")
+        transkrip_input = st.text_area("Tempel Teks Transkrip Video Viral Di Sini:", placeholder="Contoh teks video orang: Kalau kalian punya uang 50 ribu jangan dihabisin buat beli rokok...")
         
-        if st.button("🚀 Jalankan Agen 4", type="primary"):
-            if not bahan_promo:
-                st.warning("Masukkan bahan menu/promo terlebih dahulu!")
+        if st.button("🔄 Jalankan Remix Script", key="btn_agent4"):
+            if not transkrip_input:
+                st.warning("Masukkan teks transkripnya dulu, bro!")
             else:
-                with st.spinner("Agen sedang merangkai kata promosi..."):
-                    try:
-                        system_instruction = f"Anda adalah Senior Copywriter untuk '{nama_bisnis}'. Buatkan teks {jenis_copy} terstruktur menggunakan formula AIDA (Attention, Interest, Desire, Action), penuh emoji menarik, dan gaya bahasa kasual anak muda."
-                        response = client.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=bahan_promo,
-                            config=types.GenerateContentConfig(system_instruction=system_instruction, temperature=0.7)
-                        )
-                        st.subheader("📝 Hasil Teks Copywriting:")
-                        st.markdown(response.text)
-                        
-                        st.divider()
-                        st.error("🔒 FITUR PREMIUM: SEO COMPETITOR KEYWORD STEALER TERKUNCI")
-                        st.write("Fitur premium membedah algoritma kata kunci tersembunyi yang digunakan oleh kompetitor Anda di Google Maps, GrabFood, atau GoFood agar posisi toko Anda melesat ke urutan paling atas pencarian.")
-                        st.button("🔓 Buka Fitur Mata-Mata SEO Premium", key="lock_a4")
-                    except Exception as e:
-                        st.error(f"Terjadi kesalahan: {e}")
+                with st.spinner("AI sedang membedah psikologi video tersebut..."):
+                    prompt = f"Ambil struktur emosi dan gaya penyampaian dari transkrip berikut, lalu ubah topiknya menjadi promosi menu kopi susu di {nama_bisnis}. Ini teksnya: {transkrip_input}"
+                    response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
+                    st.subheader("🎉 Hasil Remix Konten Baru:")
+                    st.markdown(response.text)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # AGENT 5: AUTOMATED GRAPHIC DESIGNER
+    # TAB 5: FUNNEL & VISUAL CALENDAR
     # ==========================================
-    elif "Agent 5" in pilihan_agent:
-        st.markdown("### 🎨 Agent 5: The Automated Graphic Designer")
-        st.write("**Fungsi:** Menyusun panduan estetika visual, tata letak objek, rekomendasi warna, dan teks instruksi (*Master Prompt*) untuk membuat poster promosi atau banner menu.")
-        st.caption("🟢 **Kuota Free Trial:** 2 kali pakai per minggu.")
+    with tab5:
+        st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+        st.markdown("### 📅 Modul 5: Funnel Strategy & Content Calendar Visual Plan")
+        st.write("Pilih tingkatan corong marketing (*funnel*) untuk memproduksi ide yang tepat sasaran harian.")
         
-        tema_desain = st.text_input("Judul / Tema Poster Promosi yang Ingin Dibuat:", placeholder="Contoh: Poster Promo Jumat Berkah Diskon 20% Semua Varian Kopi")
+        col_f1, col_f2, col_f3 = st.columns(3)
+        with col_f1:
+            btn_tofu = st.button("🔵 TOFU (Awareness - Jangkauan Luas)", key="btn_tofu")
+        with col_f2:
+            btn_mofu = st.button("🟠 MOFU (Trust - Edukasi Komunitas)", key="btn_mofu")
+        with col_f3:
+            btn_bofu = st.button("🟢 BOFU (Conversion - Promo Jualan Cafe)", key="btn_bofu")
+            
+        if btn_tofu or btn_mofu or btn_bofu:
+            st.info("Meracik ide strategi funnel khusus untuk Anda...")
+            st.write("**Rekomendasi Ide Konten:** Konten video estetik sinematik memperlihatkan suasana band berinteraksi dengan pengunjung cafe malam hari penuh lampu neon.")
+            
+        st.divider()
+        st.markdown("#### 📅 Visual Content Calendar Plan (Maret 2026)")
         
-        if st.button("🚀 Jalankan Agen 5", type="primary"):
-            if not tema_desain:
-                st.warning("Masukkan tema desain poster terlebih dahulu!")
-            else:
-                with st.spinner("Agen sedang merancang brief arsitektur visual..."):
-                    try:
-                        system_instruction = "Anda adalah Art Director senior. Buatkan brief desain poster promosi yang sangat detail meliputi: rekomendasi palet warna (hex code), jenis font yang cocok, tata letak komposisi objek gambar, dan ditutup dengan teks 'Master Prompt' berbahasa Inggris untuk dimasukkan ke AI generator gambar."
-                        response = client.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=tema_desain,
-                            config=types.GenerateContentConfig(system_instruction=system_instruction, temperature=0.5)
-                        )
-                        st.subheader("📋 Brief & Panduan Produksi Visual:")
-                        st.markdown(response.text)
-                        
-                        st.divider()
-                        st.error("🔒 FITUR PREMIUM: INSTANT PYTHON GRAPHIC ENGINE TERKUNCI")
-                        st.write("Di paket premium, Agen tidak hanya memberikan teks panduan, melainkan sistem akan langsung otomatis mencetak gambar poster berformat PNG/JPG jadi menggunakan library grafis Python secara instan sekali klik tanpa software tambahan.")
-                        st.button("🔓 Aktifkan Engine Cetak Gambar Otomatis", key="lock_a5")
-                    except Exception as e:
-                        st.error(f"Terjadi kesalahan: {e}")
-
-    # ==========================================
-    # AGENT 6: AUTOMATION & WORKFLOW COPILOT
-    # ==========================================
-    elif "Agent 6" in pilihan_agent:
-        st.markdown("### ⚙️ Agent 6: The Automation & Workflow Copilot")
-        st.write("**Fungsi:** Merancang bagan logika alur kerja otomatisasi data antar aplikasi (seperti ManyChat, Zapier, Google Sheets) untuk menghilangkan kerja manual admin toko.")
-        st.caption("🟢 **Kuota Free Trial:** 3 kali rancang per minggu.")
-        
-        alur_manual = st.text_area("Deskripsikan Alur Kerja Manual yang Ingin Diotomatisasikan:", placeholder="Contoh: Kalau ada konsumen isi form pendaftaran di iklan Instagram, datanya harus otomatis masuk ke Google Sheets dan kirim pesan WA ke HP saya.")
-        
-        if st.button("🚀 Jalankan Agen 6", type="primary"):
-            if not alur_manual:
-                st.warning("Deskripsikan dulu alur kerjanya, bro!")
-            else:
-                with st.spinner("Agen sedang merancang logika otomatisasi..."):
-                    try:
-                        system_instruction = "Anda adalah Automation Engineer. Buatkan panduan arsitektur logika alur kerja (flowchart langkah demi langkah) untuk menyambungkan aplikasi yang diminta oleh user menggunakan tools otomatisasi seperti Zapier/Make agar berjalan tanpa eror."
-                        response = client.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=alur_manual,
-                            config=types.GenerateContentConfig(system_instruction=system_instruction, temperature=0.3)
-                        )
-                        st.subheader("🔗 Rekomendasi Logika Alur Otomatisasi (Workflow):")
-                        st.markdown(response.text)
-                        
-                        st.divider()
-                        st.error("🔒 FITUR PREMIUM: CUSTOM WEBHOOK & API SCRIPT INJECTION TERKUNCI")
-                        st.write("Fitur premium menyediakan kode skrip Webhook dan API kustom siap pakai yang bisa langsung di-inject ke sistem internal bisnis Anda untuk otomatisasi tanpa biaya langganan aplikasi pihak ketiga.")
-                        st.button("🔓 Buka Akses Skrip API Kustom", key="lock_a6")
-                    except Exception as e:
-                        st.error(f"Terjadi kesalahan: {e}")
-
-    # ==========================================
-    # AGENT 7: MARKET INTELLIGENCE & COMPETITOR SPY
-    # ==========================================
-    elif "Agent 7" in pilihan_agent:
-        st.markdown("### 🕵️‍♂️ Agent 7: The Market Intelligence & Competitor Spy")
-        st.write("**Fungsi:** Menembus live internet secara real-time menggunakan Google Search Grounding untuk meriset tren kopi/kuliner terkini atau membedah taktik promosi kompetitor.")
-        st.caption("🟢 **Kuota Free Trial:** 3 kali riset live internet per minggu.")
-        
-        kueri_tren = st.text_input("Tulis Tren / Nama Kompetitor yang Ingin Diriset secara Live:", placeholder="Contoh: Tren menu kopi susu viral di Indonesia saat ini")
-        
-        if st.button("🚀 Jalankan Agen 7", type="primary"):
-            if not kueri_tren:
-                st.warning("Masukkan topik riset live terlebih dahulu!")
-            else:
-                with st.spinner("Agen sedang melakukan browsing internet secara real-time..."):
-                    try:
-                        # Mengaktifkan Google Search Grounding bawaan Gemini terbaru
-                        config = types.GenerateContentConfig(
-                            system_instruction=f"Anda adalah Agen Riset Pasar Senior untuk industri F&B. Lakukan analisis mendalam berdasarkan data terbaru dari internet terkait kueri yang dicari user untuk bisnis '{nama_bisnis}'.",
-                            temperature=0.4,
-                            tools=[types.Tool(google_search=types.GoogleSearch())]
-                        )
-                        
-                        response = client.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=kueri_tren,
-                            config=config
-                        )
-                        
-                        st.subheader("🌐 Hasil Riset Tren & Intelijen Pasar Terkini:")
-                        st.markdown(response.text)
-                        
-                        st.divider()
-                        st.error("🔒 FITUR PREMIUM: COMPETITOR WEAKNESS COUNTER-MARKETING TERKUNCI")
-                        st.write("Fitur premium akan otomatis melacak ulasan buruk terbesar dari seluruh kompetitor terdekat Anda di internet, memetakan kelemahan operasional mereka, dan meracik draf materi iklan serang untuk merebut konsumen mereka.")
-                        st.button("🔓 Buka Akses Counter-Marketing Premium", key="lock_a7")
-                    except Exception as e:
-                        st.error(f"Terjadi kesalahan riset internet: {e}")
+        col_c1, col_c2, col_c3, col_c4 = st.columns(4)
+        with col_c1:
+            st.markdown("<div style='background-color:#222; padding:10px; border-radius:5px; border-left: 4px solid #FFC107;'><b>Senin, 23 Mar</b><br>📝 Ide: Kopi Susu Senja</div>", unsafe_allow_html=True)
+        with col_c2:
+            st.markdown("<div style='background-color:#222; padding:10px; border-radius:5px; border-left: 4px solid #FFC107;'><b>Selasa, 24 Mar</b><br>📝 Ide: Selasa Galau Live Music</div>", unsafe_allow_html=True)
+        with col_c3:
+            st.markdown("<div style='background-color:#222; padding:10px; border-radius:5px; border-left: 4px solid #FFC107;'><b>Rabu, 25 Mar</b><br>📝 Ide: Promo Camilan</div>", unsafe_allow_html=True)
+        with col_c4:
+            st.markdown("<div style='background-color:#161B22; padding:10px; border-radius:5px; border: 1px dashed #FFC107;'><b>Kamis, 26 Mar (Premium Only)</b><br>🔒 Terkunci</div>", unsafe_allow_html=True)
+            
+        if is_premium:
+            st.success("🔓 Akun Anda Premium: Kalender Utuh 30 Hari Terbuka Penuh!")
+        else:
+            st.error("🔒 **Fitur Premium Terkunci:** Akses kalender visual penuh selama 30 hari ke depan dibatasi di versi trial.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 elif password_input != "":
     st.error("❌ Password salah! Silakan periksa kembali token akses Anda.")
