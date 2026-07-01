@@ -25,6 +25,14 @@ st.markdown("""
         color: #FFFFFF !important;
     }
     
+    /* FIX TEKS SILAU: Mengubah kotak input biar hitam pekat dan tulisannya kuning neon */
+    div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea {
+        background-color: #000000 !important;
+        color: #FFC107 !important;
+        font-weight: bold !important;
+        border: 1px solid #FFC107 !important;
+    }
+    
     /* Custom Card/Kotak Modul biar berwarna dan berkilau */
     .premium-card {
         background-color: #161B22;
@@ -119,7 +127,6 @@ if password_input == PASSWORD_SISTEM:
     st.sidebar.markdown('<div class="premium-card" style="border-color:#FF8C00;">', unsafe_allow_html=True)
     st.sidebar.subheader("🔑 PENGATURAN LISENSI")
     
-    # Gunakan session_state untuk mengontrol nilai input kode saat tombol hapus premium ditekan
     if "license_input_value" not in st.session_state:
         st.session_state.license_input_value = ""
 
@@ -151,7 +158,7 @@ if password_input == PASSWORD_SISTEM:
         st.sidebar.warning("Batasan kuota harian aktif. Masukkan kode untuk membuka fitur premium.")
         is_premium = False
 
-    # --- 🛠️ TOMBOL HAPUS PREMIUM / RESET TO FREE (SISTEM TESTING LU) ---
+    # --- TOMBOL HAPUS PREMIUM / RESET TO FREE ---
     if is_premium:
         if st.sidebar.button("❌ Remove Premium / Reset to Free", type="secondary"):
             st.session_state.account_status = "FREE_TRIAL"
