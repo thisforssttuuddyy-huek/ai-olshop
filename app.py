@@ -43,18 +43,9 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* Kotak Free Trial */
-    .trial-card {
-        background-color: #1F1915;
-        border: 1px solid #FF8C00;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 15px;
-    }
-    
     /* Judul Utama Bergradasi */
     .main-title {
-        background: linear-gradient(45deg, #FFC107, #FF8C00);
+        background: linear-gradient(45deg, #FFC107, #FF8000);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-size: 40px;
@@ -99,7 +90,7 @@ st.markdown("""
 PASSWORD_SISTEM = "ores123"
 
 # --- BRANDING HEADER UTAMA ---
-st.markdown('<p class="main-title">⚡ TOOLS KREATOR & MARKETING SUITE Premium v5.7</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">⚡ TOOLS KREATOR & MARKETING SUITE Premium v5.9</p>', unsafe_allow_html=True)
 st.markdown('<p class="dev-subtitle">🚀 Developed with ❤️ by <b>Ky Dev</b> | 📸 Instagram: <a href="https://instagram.com/kyii_a.r" target="_blank">@kyii_a.r</a></p>', unsafe_allow_html=True)
 st.write("Sistem Multi-Agent AI Kreator Konten End-to-End & OmniChannel Reputation Manager.")
 
@@ -178,18 +169,19 @@ if password_input == PASSWORD_SISTEM:
     # --- SIDEBAR FOOTER BRANDING ---
     st.sidebar.markdown("<br><br><hr><center style='color: #A3B3C6;'>🛠️ App Created by <b>Ky Dev</b><br>🔗 IG: <a href='https://instagram.com/kyii_a.r' target='_blank' style='color:#FFC107; text-decoration:none;'>@kyii_a.r</a></center>", unsafe_allow_html=True)
 
-    # --- INTEGRASI MENU 5 TAB MULTI-MODUL ---
+    # --- INTEGRASI MENU 6 TAB MULTI-MODUL ---
     st.subheader("🤖 Silakan Pilih Modul Kerja AI Agent Anda:")
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "🛡️ 1. Reputation Manager", 
         "🧬 2. Branding Assessment", 
         "🎬 3. Script & Ideation", 
         "🔄 4. Remix Video Viral", 
-        "📅 5. Funnel & Calendar"
+        "📅 5. Funnel & Calendar",
+        "💬 6. Marketing Specialist Chat"
     ])
 
     # ==========================================
-    # TAB 1: REPUTATION MANAGER (FIXED MODEL 2026)
+    # TAB 1: REPUTATION MANAGER (KILAT - FIXED JSON)
     # ==========================================
     with tab1:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
@@ -206,11 +198,10 @@ if password_input == PASSWORD_SISTEM:
             else:
                 with st.spinner("AI sedang membaca ulasan..."):
                     system_instruction = f"""
-                    Anda adalah Manajer Reputasi Senior untuk {nama_bisnis} yang beralamat di {alamat_bisnis} (Maps: {link_maps}).
-                    Balas ulasan dengan memanggil konsumen menggunakan kata 'Kakak'.
-                    Sesuaikan gaya bahasa: Google Maps (sopan), Instagram (estetik hangat), TikTok (gaul santai), WhatsApp (responsif cepat).
-                    Jika bertanya lokasi, wajib lampirkan link maps {link_maps}.
-                    Output wajib JSON: {{"sentiment": "POSITIF/NEGATIF", "reply_draft": "isi balasan"}}
+                    Anda adalah Manajer Reputasi Senior untuk {nama_bisnis} ({alamat_bisnis}).
+                    Balas singkat, padat, jangan bertele-tele. Panggil konsumen dengan 'Kakak'.
+                    Gaya bahasa sesuai platform {platform}. Wajib sisipkan link maps {link_maps} jika ditanya lokasi.
+                    Output wajib JSON murni tanpa markdown: {{"sentiment": "POSITIF/NEGATIF", "reply_draft": "isi balasan"}}
                     """
                     try:
                         response = client.models.generate_content(
@@ -219,7 +210,7 @@ if password_input == PASSWORD_SISTEM:
                             config=types.GenerateContentConfig(
                                 system_instruction=system_instruction,
                                 response_mime_type="application/json",
-                                temperature=0.3
+                                temperature=0.1
                             )
                         )
                         res_json = json.loads(response.text)
@@ -238,7 +229,7 @@ if password_input == PASSWORD_SISTEM:
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # TAB 2: BRANDING ASSESSMENT (FIXED CONFIG TO LEAK)
+    # TAB 2: BRANDING ASSESSMENT (KILAT STREAMING ⚡)
     # ==========================================
     with tab2:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
@@ -250,25 +241,29 @@ if password_input == PASSWORD_SISTEM:
         step3 = st.text_input("Langkah 3: Model Bisnis Apa yang Anda Jalankan?", value="FnB Tempat Nongkrong & Event Komunitas")
         
         if st.button("🧬 Generate Master Blueprint", key="btn_agent2"):
-            with st.spinner("AI menyintesis data personal brand lu..."):
-                try:
-                    blueprint_prompt = f"Buatkan kerangka master strategi personal branding konten bisnis kuliner dengan target audiens: {step1}, menggunakan USP: {step2}, dengan model bisnis: {step3}."
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash', 
-                        contents=blueprint_prompt,
-                        config=types.GenerateContentConfig(temperature=0.5)
-                    )
-                    st.subheader("📋 Hasil Cetak Master Blueprint:")
-                    st.markdown(response.text)
+            blueprint_prompt = f"Buatkan secara padat, ringkas, poin penting, kerangka strategi personal branding konten kuliner. Audiens: {step1}, USP: {step2}, Model Bisnis: {step3}. Jangan bertele-tele!"
+            st.subheader("📋 Hasil Cetak Master Blueprint:")
+            
+            output_area = st.empty()
+            full_text = ""
+            try:
+                response_stream = client.models.generate_content_stream(
+                    model='gemini-2.5-flash', 
+                    contents=blueprint_prompt,
+                    config=types.GenerateContentConfig(temperature=0.2)
+                )
+                for chunk in response_stream:
+                    full_text += chunk.text
+                    output_area.markdown(full_text)
                     
-                    if not is_premium:
-                        st.markdown("<p style='color:#FF8C00;'>🔒 <b>Fitur Premium Terkunci:</b> Deep Competitive Positioning (Analisis 3 Kompetitor Terdekat di Google Search Live) hanya terbuka bagi versi premium.</p>", unsafe_allow_html=True)
-                except Exception as e:
-                    st.error(f"Eror Modul 2: {e}")
+                if not is_premium:
+                    st.markdown("<p style='color:#FF8C00;'>🔒 <b>Fitur Premium Terkunci:</b> Deep Competitive Positioning (Analisis 3 Kompetitor Terdekat di Google Search Live) hanya terbuka bagi versi premium.</p>", unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"Eror Modul 2: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # TAB 3: SCRIPT BUILDER & IDEATION (FIXED CONFIG)
+    # TAB 3: SCRIPT BUILDER & IDEATION (KILAT STREAMING ⚡)
     # ==========================================
     with tab3:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
@@ -284,36 +279,44 @@ if password_input == PASSWORD_SISTEM:
             btn_full = st.button("🎬 Generate Full Script", key="btn_full")
             
         if btn_hook:
-            with st.spinner("Meracik pilihan kalimat hook..."):
-                try:
-                    prompt = f"Buatkan 3 pilihan kalimat hook marketing video tiktok kontroversial tentang topik: {topik_konten}"
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash', 
-                        contents=prompt,
-                        config=types.GenerateContentConfig(temperature=0.7)
-                    )
-                    st.write("**Pilihan Opsi Hook Anda:**")
-                    st.info(response.text)
-                except Exception as e:
-                    st.error(f"Eror Hook: {e}")
+            prompt = f"Buatkan 3 kalimat hook pendek, nendang, dan kontroversial untuk tiktok. Topik: {topik_konten}"
+            st.write("**Pilihan Opsi Hook Anda:**")
+            
+            output_area = st.empty()
+            full_text = ""
+            try:
+                response_stream = client.models.generate_content_stream(
+                    model='gemini-2.5-flash', 
+                    contents=prompt,
+                    config=types.GenerateContentConfig(temperature=0.4)
+                )
+                for chunk in response_stream:
+                    full_text += chunk.text
+                    output_area.info(full_text)
+            except Exception as e:
+                st.error(f"Eror Hook: {e}")
                 
         if btn_full:
-            with st.spinner("Menyusun skrip lengkap..."):
-                try:
-                    prompt = f"Buatkan skrip video pendek tiktok utuh (Struktur: Hook menarik, Isi edukasi, CTA jualan) dengan topik: {topik_konten}"
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash', 
-                        contents=prompt,
-                        config=types.GenerateContentConfig(temperature=0.6)
-                    )
-                    st.subheader("Draft Script Terkini:")
-                    st.markdown(response.text)
-                except Exception as e:
-                    st.error(f"Eror Script: {e}")
+            prompt = f"Buatkan skrip video pendek singkat, padat, terstruktur (Hook, Isi, CTA). Topik: {topik_konten}"
+            st.subheader("Draft Script Terkini:")
+            
+            output_area = st.empty()
+            full_text = ""
+            try:
+                response_stream = client.models.generate_content_stream(
+                    model='gemini-2.5-flash', 
+                    contents=prompt,
+                    config=types.GenerateContentConfig(temperature=0.3)
+                )
+                for chunk in response_stream:
+                    full_text += chunk.text
+                    output_area.markdown(full_text)
+            except Exception as e:
+                st.error(f"Eror Script: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
-    # TAB 4: REMIX VIDEO VIRAL (FIXED CONFIG)
+    # TAB 4: REMIX VIDEO VIRAL (KILAT STREAMING ⚡)
     # ==========================================
     with tab4:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
@@ -326,18 +329,22 @@ if password_input == PASSWORD_SISTEM:
             if not transkrip_input:
                 st.warning("Masukkan teks transkripnya dulu, bro!")
             else:
-                with st.spinner("AI sedang membedah psikologi video tersebut..."):
-                    try:
-                        prompt = f"Ambil struktur emosi dan gaya penyampaian dari transkrip berikut, lalu ubah topiknya menjadi promosi menu kopi susu di {nama_bisnis}. Ini teksnya: {transkrip_input}"
-                        response = client.models.generate_content(
-                            model='gemini-2.5-flash', 
-                            contents=prompt,
-                            config=types.GenerateContentConfig(temperature=0.5)
-                        )
-                        st.subheader("🎉 Hasil Remix Konten Baru:")
-                        st.markdown(response.text)
-                    except Exception as e:
-                        st.error(f"Eror Modul 4: {e}")
+                prompt = f"Remix singkat dan padat transkrip ini menjadi promosi menu kopi susu di {nama_bisnis}. Jangan bertele-tele. Teks asli: {transkrip_input}"
+                st.subheader("🎉 Hasil Remix Konten Baru:")
+                
+                output_area = st.empty()
+                full_text = ""
+                try:
+                    response_stream = client.models.generate_content_stream(
+                        model='gemini-2.5-flash', 
+                        contents=prompt,
+                        config=types.GenerateContentConfig(temperature=0.3)
+                    )
+                    for chunk in response_stream:
+                        full_text += chunk.text
+                        output_area.markdown(full_text)
+                except Exception as e:
+                    st.error(f"Eror Modul 4: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ==========================================
@@ -346,7 +353,7 @@ if password_input == PASSWORD_SISTEM:
     with tab5:
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
         st.markdown("### 📅 Modul 5: Funnel Strategy & Content Calendar Visual Plan")
-        st.write("Pilih tingkatan corong marketing (*funnel*) untuk memproduksi ide yang tepat sasaran harian.")
+        st.write("Pilih tingkatan corong marketing (*funnel*) untuk memproduksi ide yang tepat saran harian.")
         
         col_f1, col_f2, col_f3 = st.columns(3)
         with col_f1:
@@ -377,6 +384,46 @@ if password_input == PASSWORD_SISTEM:
             st.success("🔓 Akun Anda Premium: Kalender Utuh 30 Hari Terbuka Penuh!")
         else:
             st.error("🔒 **Fitur Premium Terkunci:** Akses kalender visual penuh selama 30 hari ke depan dibatasi di versi trial.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # ==========================================
+    # TAB 6: DIGITAL MARKETING CHATROOM (KILAT STREAMING ⚡)
+    # ==========================================
+    with tab6:
+        st.markdown('<div class="premium-card" style="border-color: #00FF00;">', unsafe_allow_html=True)
+        st.markdown("### 💬 Modul 6: Specialist Marketing Chatroom (Consultation AI)")
+        st.write("Diskusikan kendala omset, strategi iklan Meta/TikTok Ads, atau taktik promosi cafe lo langsung dengan Konsultan AI Senior.")
+        st.caption("🟢 **Kuota Gratis:** 3 kali chat per hari." if not is_premium else "👑 **Kuota:** UNLIMITED PREMIUM CHAT")
+        
+        pertanyaan_marketing = st.text_area("Tulis Pertanyaan / Bahan Diskusi Marketing Lo di Sini:", placeholder="Contoh: Bro, cafe gue sepi pas hari Rabu malam, taktik promo apa yang instan?")
+        
+        if st.button("💬 Mulai Diskusi Taktis", key="btn_agent6"):
+            if not pertanyaan_marketing:
+                st.warning("Tulis dulu pertanyaan lo, bro!")
+            else:
+                system_instruction = f"""
+                Anda adalah Senior Digital Marketing Specialist bernama 'Ky-AI Marketer'.
+                Berikan jawaban sangat padat, to-the-point, praktis, dan berenergi untuk bisnis '{nama_bisnis}'.
+                Gunakan gaya bahasa kasual (panggil user dengan sebutan 'Bro'). Dilarang memberikan intro basa-basi bertele-tele!
+                """
+                st.subheader("💡 Saran Solusi dari Specialist Marketing AI:")
+                
+                output_area = st.empty()
+                full_text = ""
+                try:
+                    response_stream = client.models.generate_content_stream(
+                        model='gemini-2.5-flash', 
+                        contents=pertanyaan_marketing,
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_instruction,
+                            temperature=0.3
+                        )
+                    )
+                    for chunk in response_stream:
+                        full_text += chunk.text
+                        output_area.markdown(full_text)
+                except Exception as e:
+                    st.error(f"Eror Modul 6 Chatroom: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
 elif password_input != "":
